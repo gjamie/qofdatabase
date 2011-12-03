@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Downloads</h1>
+<p>These downloads contain all of the data in the database for specific years. A larger roundup is in the works and the 2011 data will be here shortly.</p>
+<p>Please be aware these are large datasets (around 30Mb each) which will not fit onto a spreadsheet.</p>
+<h1>Access Databases</h1>
+<p>These contain the data and some relationships between the tables. Forms and reports are left up to you.</p>
+<p><a href="{{ STATIC_URL }}download/qof0910access-2.zip">2010 Access Data</a></p>
+<p><a href="{{ STATIC_URL }}download/qof2008-9_access.zip">2009 Access Data</a></p>
+<p><a href="{{ STATIC_URL }}download/qof2008access.zip">2008 Access Data</a></p>
+<p><a href="{{ STATIC_URL }}download/qof2007access.zip">2007 Access Data</a></p>
+<p><a href="{{ STATIC_URL }}download/qof6-access.zip>2006 Access Data</a></p>
+<h1>Generic CSV and SQL downloads</h1>
+<p>A little more work but easy to put into a server database. Much smaller downloads - a little over 15Mb each</p>
+<p><a href="{{ STATIC_URL }}download/qof0910csv-2.zip">2010 CSV Data</a></p>
+<p><a href="{{ STATIC_URL }}download/qof2008-9-csv-and-sql_v2.zip">2009 CSV Data</a></p>
+<p><a href="{{ STATIC_URL }}download/QOF2008csv.tgz">2008 CSV Data</a></p>
+<p><a href="{{ STATIC_URL }}download/qof0607csv.zip">2007 CSV Data</a></p>
+<p><a href="{{ STATIC_URL }}download/qof6.zip">2006 CSV Data</a></p>
+<p><a href="{{ STATIC_URL }}download/qof.tgz">2005 CSV Data</a></p>
+{%endblock %}
+
+

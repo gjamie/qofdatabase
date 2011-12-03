@@ -1,0 +1,35 @@
+{% extends "datapage.html" %}
+{% load qoftags %}
+{% block data %}
+<a href="{% url qofdb.views.browse orgcode=org.orgcode year=year %}">Back to prevalence page</a>
+{% url qofdb.views.browse orgcode=code year=99 area=area as thispage%}
+{%include 'selectyear.html' %}
+<h2>{{ area }}</h2>
+<table summary="Data for this organisation" >
+<thead><tr>{% for heading in table.headings %}<th>{{heading}}</th>{% endfor %}</thead>
+{% for row in table.data %}
+<tr>
+<td title="{{ row.description }}" class="indicator">{{ row.indicator|upper }}</td>
+{% if row.boolean %}
+	{% if row.numerator %}
+			<td class="number">Yes</td>
+		{% else %}
+			<td class="number">No</td>
+		{% endif %}
+		<td></td><td></td><td></td>
+{% else %}
+	<td class="number">{{ row.numerator }}</td>
+	<td class="number">{{ row.denominator }}</td>
+	<td class="number">{{ row.ratio|percentage }}</td>
+	{% if org.level < 25 %}
+<td class="number">{{ row.centile|centile }}</td>
+{% endif %}
+
+{% endif %}
+{% if org.level > 0 %}
+<td><a href="{% url qofdb.views.area year=year orgcode=org.orgcode indicator=row.indicator %}" ><img src="{{ STATIC_URL }}/img/drill-plus.png" title="Show data for member organisations" ></a></td>
+{% endif %}
+</tr>
+{% endfor %}
+</table>
+{% endblock %}

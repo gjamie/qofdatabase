@@ -1,0 +1,32 @@
+{% extends "datapage.html" %}
+{% load qoftags %}
+
+{% block data %}
+{% url qofdb.views.area orgcode=org.orgcode year=99 indicator=indicator.areaid as thispage %}
+{%include 'selectyear.html' %}
+<h1>Data for {{ indicator.areaid }}</h1>
+<p>{{ indicator.description }}</p>
+<table summary="Data for this organisation" >
+<thead><tr>{% for heading in table.headings %}<th>{{heading}}</th>{% endfor %}</tr></thead>
+{% for row in table.data %}
+<tr>
+<td title="{{ row.orgcode__name }}" ><a href="{%url qofdb.views.browse orgcode=row.orgcode year=year %}">{{ row.orgcode__name|truncatewords:4 }}</a></td>
+{% if row.orgcode__level = 0 and row.areaid__flavour = 3 %}
+	{% if row.numerator %}
+			<td class="number">Yes</td>
+		{% else %}
+			<td class="number">No</td>
+		{% endif %}
+		<td></td><td></td><td></td>
+{% else %}
+	<td class="number">{{ row.numerator }}</td>
+	<td class="number">{{ row.denominator }}</td>
+	<td class="number">{{ row.ratio|percentage }}</td>
+{% if row.orgcode__level < 25 %}
+	<td class="number">{{ row.centile|centile }}</td>
+	{% endif %}
+{% endif %}
+</tr>
+{% endfor %}
+</table>
+{% endblock %}

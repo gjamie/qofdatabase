@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% load qoftags %}
+{% block content %}
+
+<script type="text/javascript">
+      google.load("visualization", "1", {packages:["corechart"]});
+</script>
+<div id="main_content">
+<span class="breadcrumbs">
+{% for ancestor in ancestors reversed %}
+<a href="{% url qofdb.views.browse orgcode=ancestor.code year=year %}" >{{ancestor.name}}</a> > 
+{% endfor %}
+{{ org.name }}
+</span>	
+<p>{{ message }}
+<div class="vcard">
+<h1 id="orgname"><span class="fn org">{{ org.name }}</span></h1>
+<span id="orgaddress">{{ org.niceaddr }}</span>
+{% if org.level > 0 %}<a href="#childorgs" id="childlink">See member list for this organisation</a>{%endif%}</div>
+
+<div id="datatable">
+{%block data %}
+{%endblock data %}
+</div>
+</div>
+{% endblock %}

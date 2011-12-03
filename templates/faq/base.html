@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Help and FAQ{% endblock %}
+{%block content %}
+<body>
+  {% for message in messages %}
+    <p class="message">{{ message }}</p>
+  {% endfor %}
+  {% block body %}{% endblock %}
+{% endblock %}
+
