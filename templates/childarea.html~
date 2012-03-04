@@ -2,7 +2,7 @@
 {% load qoftags %}
 
 {% block data %}
-{% url qofdb.views.area orgcode=org.orgcode year=99 indicator=indicator as thispage %}
+{% url qofdb.views.area orgcode=org.orgcode year=99 indicator=indicator.areaid as thispage %}
 {%include 'selectyear.html' %}
 <h1>Data for {{ indicator.areaid }}</h1>
 <p>{{ indicator.description }}</p>
@@ -29,4 +29,39 @@
 </tr>
 {% endfor %}
 </table>
+   <script type="text/javascript">
+      google.load("visualization", "1", {packages:["corechart"]});
+      google.setOnLoadCallback(drawChart);
+      
+      function selectHandler(e) {
+        alert(e.getSelection())
+        }
+      function drawChart() {
+        var data = new google.visualization.DataTable();
+        data.addColumn('string', 'Organisation');
+        data.addColumn('number','Prevalence');
+        data.addColumn({type:'boolean', role:'scope'}); 
+        data.addRows({{ table.data|length }});
+        {% for row in table.data %}
+        data.setValue({{ forloop.counter0}},0,"{{ row.orgcode__name }}");
+        data.setValue({{ forloop.counter0}},1,{{ row.ratio }}*100);
+        {% if row.orgcode__level < org.level %}
+        data.setValue({{ forloop.counter0}},2,true);
+        {% else %}
+        data.setValue({{ forloop.counter0}},2,false);
+        {% endif %}
+        {% endfor %}
+        
+        var formatter = new google.visualization.TableNumberFormat({suffix: "%",fractionDigits:2});
+        formatter.format(data, 1); // Apply formatter to second column
+        var chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
+        chart.draw(data, {width: 1000, height: 400, title: '{{org.name}} values for {{ indicator.areaid }}',
+                          hAxis: {title: 'Organisation', titleTextStyle: {color: 'blue'}},
+                          vAxis: {title: 'Prevalence (%)	'},
+                          chartArea: {left: 60}
+                         });
+        //google.visualization.events.addListener(chart, 'select', function() {alert(chart.getSelection()[0].column);}); 
+        }
+      </script>
+<div id="chart_div"></div>
 {% endblock %}

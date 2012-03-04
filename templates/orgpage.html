@@ -16,11 +16,16 @@
 {% if level > 0 %}
 <td><a href="{% url qofdb.views.area year=year orgcode=code indicator=row.indicator %}" ><img src="{{ STATIC_URL }}/img/drill-plus.png" title="Show data for member organisations" ></a></td>
 {% endif %}
+<td><a href="{% url qofdb.views.timeline orgcode=code indicator=row.indicator %}" ><img src="{{ STATIC_URL }}/img/calendar.png" alt="Show timeline" ></td>
 </tr> {% endfor %}
 </table>
     <script type="text/javascript">
       google.load("visualization", "1", {packages:["corechart"]});
       google.setOnLoadCallback(drawChart);
+      
+      function selectHandler(e) {
+        alert(e.getSelection())
+        }
       function drawChart() {
         var data = new google.visualization.DataTable();
         data.addColumn('string', 'Area');
@@ -45,6 +50,7 @@
                           vAxis: {title: 'Prevalence (%)	'},
                           chartArea: {left: 60}
                          });
+        //google.visualization.events.addListener(chart, 'select', function() {alert(chart.getSelection()[0].column);}); 
         }
       </script>
 <div id="chart_div"></div>

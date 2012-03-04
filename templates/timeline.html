@@ -1,16 +1,15 @@
 {% extends "datapage.html" %}
 {% load qoftags %}
 {% block data %}
-<a href="{% url qofdb.views.browse orgcode=org.orgcode year=year %}">Back to prevalence page</a>
-{% url qofdb.views.browse orgcode=org.orgcode year=99 area=area as thispage%}
-{%include 'selectyear.html' %}
-<h2>{{ area }}</h2>
+<h2>{{ indicator.areaid }}</h2>
+<p>{{ indicator.description }}</p>
 <table summary="Data for this organisation" >
-<thead><tr>{% for heading in table.headings %}<th>{{heading}}</th>{% endfor %}</thead>
+<thead><tr>{% for heading in table.headings %}<th>{{heading}}</th>{% endfor %}</tr></thead>
 {% for row in table.data %}
 <tr>
-<td title="{{ row.description }}" class="indicator">{{ row.indicator|upper }}</td>
-{% if row.boolean %}
+<td title="{{ row.description }}" class="indicator">{{ row.area }}</td>
+<td>{{ row.year|add:"2000" }}</td>
+{% if org.level = 0 and row.flavour = 3 %}
 	{% if row.numerator %}
 			<td class="number">Yes</td>
 		{% else %}
@@ -21,16 +20,10 @@
 	<td class="number">{{ row.numerator }}</td>
 	<td class="number">{{ row.denominator }}</td>
 	<td class="number">{{ row.ratio|percentage }}</td>
-	{% if org.level < 25 %}
-<td class="number">{{ row.centile|centile }}</td>
+{% if row.orgcode__level < 25 %}
+	<td class="number">{{ row.centile|centile }}</td>
+	{% endif %}
 {% endif %}
-
-{% endif %}
-{% if org.level > 0 %}
-<td><a href="{% url qofdb.views.area year=year orgcode=org.orgcode indicator=row.indicator %}" ><img src="{{ STATIC_URL }}/img/drill-plus.png" title="Show data for member organisations" ></a></td>
-{% endif %}
-<td><a href="{% url qofdb.views.timeline orgcode=code indicator=row.indicator %}" ><img src="{{ STATIC_URL }}/img/calendar.png" alt="Show timeline" ></td>
-</tr>
 {% endfor %}
 </table>
     <script type="text/javascript">
@@ -38,12 +31,12 @@
       google.setOnLoadCallback(drawChart);
       function drawChart() {
         var data = new google.visualization.DataTable();
-        data.addColumn('string', 'Area');
+        data.addColumn('string', 'Year');
         data.addColumn('number', '{{org.name}}');
         {% for ancestor in ancestors %}
         data.addColumn('number','{{ancestor.name}}'); 
 {% endfor %}
-        data.addRows({{ areano }});
+        data.addRows({{ yearno }});
         {% for area in graph %}
         data.setValue{{area|safe}}
         {% endfor %}
@@ -54,10 +47,10 @@
             {
             formatter.format(data,i)
             }
-        var chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
-        chart.draw(data, {width: 1000, height: 400, title: 'Comparators for {{area}}',
-                          hAxis: {title: 'Indicator', titleTextStyle: {color: 'blue'}},
-                          vAxis: {title: '%'},
+        var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+        chart.draw(data, {width: 1000, height: 400, title: '{{org.name}}',
+                          hAxis: {title: 'Year', titleTextStyle: {color: 'blue'}},
+                          vAxis: {title: 'Achievement (%)	'},
                           chartArea: {left: 60}
                          });
         }

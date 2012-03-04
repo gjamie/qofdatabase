@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% load qoftags %}
 {% block content %}
+{% if results %}
 <h1>Search Results</h1>
 <ul>
 {% for result in results %}
@@ -8,4 +9,8 @@
 <span class="childaddr">{{ result.niceaddr }}</span></li>
 {% endfor %}
 </ul>
+{% else %}
+<form action="/search/" method="GET">
+<span id="form"> {{ search.as_p }}</span></form>
+{% endif %}
 {% endblock %}

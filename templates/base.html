@@ -17,7 +17,7 @@
 <body>
 <div id="title">
 <form action="/search/" method="GET">
-<span id="searchbox"> {{ search.as_p }}</span></form>
+<span id="searchbox"><p>Find organisation: {{ search.search }}</p></span></form>
 <h1>QOF database</h1></div>
 <div id="topmenu"><a href="{% url qofdb.views.browse orgcode='UK' year=year|default:11 %}" >Home</a> | <a href="http://news.gpcontract.co.uk" >News</a> | <a href="{% url qofdb.views.download %}" >Downloads</a> | <a href="{%url faq_topic_list%}" >FAQ</a></div>
 {% block content %}{% endblock %}
