@@ -1,6 +1,0 @@
-{% load qoftags %}
-<div id="years">
-{% for listyr in years %}
-<a href="{{ thispage|addyear:listyr }}"><div class="year{% if year == listyr %} current{% endif %}">{{ listyr|add:2000}}</div></a>
-{% endfor %}
-</div>
