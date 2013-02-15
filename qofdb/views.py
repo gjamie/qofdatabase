@@ -17,7 +17,7 @@ def browse(request,orgcode,year=None,area=None):
     England=('ENG' in orgs['orglist'])#Is there England somewhere here
     data=[]
     if area==None: #if no specific area if given we send out prevalence
-        message="Lots is new here. See the News section and the FAQ above for some of the new features!"
+        message="2012 Data for Scotland, England and Wales now online!"
         prevalence=orgs['organisation'].achievement_set.filter(areaid__flavour=1,year=year).values('areaid_id','areaid__prevtext','ratio','centile','areaid__area')
         headings=['Area','Prevalence']
         if orgs['organisation'].level <25:
@@ -25,6 +25,8 @@ def browse(request,orgcode,year=None,area=None):
         areas=[]
         allprevs=models.Achievement.objects.filter(orgcode__in=orgs['orglist'],areaid__flavour=1,year=year).values('ratio','areaid__area','areaid__prevtext','orgcode')
         nonclin=('Palliative Care','Records','Cervical Screening','Child Health Surveillance','Sexual Health','Education and Training','Patient Communication','Maternity Services','Medicines Management','Patient Experience','Practice Management')
+        if year>=12 :
+            nonclin+=('Quality and Productivity',)
         graphorgs=[orgs['organisation'].name]#start with practice in the list
         for org in orgs['ancestors']:
             graphorgs.append(org['name'])
@@ -43,7 +45,7 @@ def browse(request,orgcode,year=None,area=None):
                 graph.append((prevareas.index(prev['areaid__prevtext']),orgs['orglist'].index(prev['orgcode'])+2,prev['ratio']*100))
             except ValueError:
                 pass
-        return render_to_response('orgpage.html',{'england':England,'message':message,'org':orgs['organisation'],'search':searchForm(),'title':orgs['organisation'].name,'years':defaults.years(),'ancestors':orgs['ancestors'],'table':table,'code':orgcode,'year':year,'graph':graph,'areano':len(prevareas),'level':orgs['organisation'].level,'children':orgs['children'],'nonclin':nonclin},context_instance=RequestContext(request))
+        return render_to_response('orgpage.html',{'england':England,'message':message,'org':orgs['organisation'],'search':searchForm(),'title':orgs['organisation'].name,'years':defaults.years(),'ancestors':orgs['ancestors'],'table':table,'code':orgcode,'year':year,'graph':graph,'areano':len(prevareas),'level':orgs['organisation'].level,'children':orgs['children'],'nonclin':nonclin,'alt_parent':orgs['alt']},context_instance=RequestContext(request))
     else:
         #here we are looking for a specific disease area
         indicators=orgs['organisation'].achievement_set.filter(areaid__area=area,year=year).order_by("areaid__sort_order").values('areaid','areaid__description','areaid__flavour','numerator','denominator','ratio','centile')
@@ -114,20 +116,24 @@ def timeline(request,orgcode,indicator):
     data=[]
     baseIndicator=get_object_or_404(models.Indicator,areaid=indicator)
     achievements=list(models.Achievement.objects.filter(areaid__base=baseIndicator.base,orgcode=orgcode).order_by("year").values('year','areaid','areaid__description','numerator','denominator','ratio','centile','areaid__flavour'))#using list as we want an actual list here
-    firstyear=achievements[0]['year']
+    firstyear=defaults.minyear
     lastyear=achievements[-1]['year']#this is why we wanted the list
     graph=[]
+    years=set()
     for achievement in achievements:
         data.append({'area':achievement['areaid'],'description':achievement['areaid__description'],'year':achievement['year'],'numerator':achievement['numerator'],'denominator':achievement['denominator'],'ratio':achievement['ratio'],'centile':achievement['centile'],'flavour':achievement['areaid__flavour']})
-        graph.append((achievement['year']-firstyear,0,str(achievement['year']+2000)))
+        graph.append((achievement['year'],0,str(achievement['year']+2000)))
         if achievement['ratio'] is not None:
-            graph.append((achievement['year']-firstyear,1,achievement['ratio']*100))
+            graph.append((achievement['year'],1,achievement['ratio']*100))
+        years.add(achievement['year'])
     allach=models.Achievement.objects.filter(areaid__base=baseIndicator.base,orgcode__in=orgs['orglist']).order_by('year').values('year','orgcode','ratio')
     for ach in allach:
         if ach['ratio'] is not None:
-            graph.append((ach['year']-firstyear,orgs['orglist'].index(ach['orgcode'])+2,ach['ratio']*100))
+            graph.append((ach['year'],orgs['orglist'].index(ach['orgcode'])+2,ach['ratio']*100))
+        years.add(ach['year'])
     table={'headings':headings,'data':data}
-    return render_to_response('timeline.html',{'indicator':baseIndicator,'yearno':1+lastyear-firstyear,'graph':graph,'ancestors':orgs['ancestors'],'year':year,'title':indicator+' - '+orgs['organisation'].name,'search':searchForm(),'table':table,'org':orgs['organisation']},context_instance=RequestContext(request))
+    graph=[(line[0]-min(years),line[1],line[2]) for line in graph]#correcting for variable start year
+    return render_to_response('timeline.html',{'indicator':baseIndicator,'yearno':len(years),'graph':graph,'ancestors':orgs['ancestors'],'year':year,'title':indicator+' - '+orgs['organisation'].name,'search':searchForm(),'table':table,'org':orgs['organisation']},context_instance=RequestContext(request))
     
     
         
@@ -138,9 +144,16 @@ def getorgDetails(orgcode,year):
     #now we make a recursive list of the parents of the current organisation
     ancestors=[]
     curorg=organisation #set off the loop
+    parents=curorg.orgheirarchy_set.filter(year=year).order_by("-parent__level") #we will send the same query in a moment - cached
+    if len(parents)>1 :
+        alt={}
+        alt['name']=parents[1].parent.name
+        alt['code']=parents[1].parent.orgcode
+    else:
+        alt=False
     orglist=[]                                                 
     while True:
-        parents=curorg.orgheirarchy_set.filter(year=year)
+        parents=curorg.orgheirarchy_set.filter(year=year).order_by("-parent__level")
         if len(parents):
             anc_details={}
             curorg=parents[0].parent # get the first parent from the list. Does not cope with multiple heirarchies just yet
@@ -155,7 +168,7 @@ def getorgDetails(orgcode,year):
     else :
         childdet=False #we will pass it later so it has to exist
         children=False
-    return{'organisation':organisation,'ancestors':ancestors,'orglist':orglist,'children':children,}
+    return{'organisation':organisation,'alt':alt,'ancestors':ancestors,'orglist':orglist,'children':children,}
 
 class searchForm(forms.Form):
     search=forms.CharField(max_length=70)

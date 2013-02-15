@@ -11,7 +11,10 @@
 <a href="{% url qofdb.views.browse orgcode=ancestor.code year=year %}" >{{ancestor.name}}</a> > 
 {% endfor %}
 {{ org.name }}
-</span>	
+</span>
+{% if alt_parent %}
+<p><span class="alt">Also a member of <a href="{% url qofdb.views.browse orgcode=alt_parent.code year=year %}" >{{ alt_parent.name }}</a></span></p>
+{% endif %}	
 <p>{{ message }}
 <div class="vcard">
 <h1 id="orgname"><span class="fn org">{{ org.name }}</span></h1>

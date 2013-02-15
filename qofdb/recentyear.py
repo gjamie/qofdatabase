@@ -1,5 +1,5 @@
 import models
-
+#get the most recent address for all organisations
 orgs=models.Organisation.objects.all()
 
 for org in orgs:
@@ -8,7 +8,7 @@ for org in orgs:
     except:
         print "I dont know about"+org.orgcode
     org.name=details.name
-    org.address=details.address
+    org.addr=details.address
     org.postcode=details.postcode
     org.website=details.website
     org.save()
