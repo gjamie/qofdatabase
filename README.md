@@ -7,7 +7,9 @@ Installation
 ============
 
 $ mkvirtualenv -a `pwd` qof
+
 $ pip install -r requirements.txt
+
 $ cp local_settings.py.example local_settings.py
 
 Edit local_settings.py as appropriate.
