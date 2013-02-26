@@ -1,0 +1,6 @@
+Django==1.4.5
+argparse==1.2.1
+distribute==0.6.24
+django-debug-toolbar==0.9.4
+-e git://github.com/howiworkdaily/django-faq.git@f5a5cc9ad4b090529ba138590de776e48e47609c#egg=django_faq-dev
+wsgiref==0.1.2

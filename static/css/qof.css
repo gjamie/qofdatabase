@@ -1,0 +1,122 @@
+@import url(http://fonts.googleapis.com/css?family=Rosario:400,400italic);
+
+img {
+   border: none;
+   }	
+
+html {
+   font-family:'Arial','Sans';
+   background:#FFFFFF;
+   }
+
+#title {
+   font-family:'Rosario','Sans';
+   font-style:normal;
+   font-weight:normal;
+   color:#255858;
+   font-size:1.5em;
+   margin-left:0.5em;
+   }
+   
+#searchbox {
+   float:right;
+   }
+   
+h1 {
+   margin:10px 0px;
+   color:#255858;
+   font-weight:normal;
+   }
+   
+#topmenu {
+   font-family:'Rosario';
+   background:#009999;
+   color:#80FFFF;
+   text-align:center;
+   border:7px solid;
+   border-color:#009999;
+   margin:10px 0px;
+   }
+ 
+#topmenu a {
+   color:#E6FFFF;
+   margin:10px;
+   }
+
+   
+#orgname, #section {
+   color:#255858;
+}
+
+#years {
+   margin:10px 10px 10px 0;
+   float:left;
+   font-size:large;
+}
+
+.year {
+   padding:15px;
+   background:#E6FFFF;
+   color:#255858;
+   margin: 3px;
+   border-radius:3px;
+}
+
+table {
+   margin-top:1em;
+   }
+
+.year:hover {
+   background:#80FFFF;}
+
+.current {
+   font-size:xx-large;
+   background: #255858;
+   color:#E6FFFF;
+  }
+  
+#chart_div {
+   margin:0 0 0 7em;
+}
+
+#footer {
+  margin-top: 3em; 
+  font-size:smaller;
+  text-align:center;
+  background:#E6FFFF;
+  clear:both;
+}
+
+#england {
+  float:right;
+  }
+
+td.number {
+   text-align:right;
+   padding:0 .8em;
+  }
+  
+td.indicator {
+   border-bottom: 1px dotted rgb(61,92,122);
+   cursor: help;
+} 
+  
+.breadcrumbs {
+  font-size:smaller;
+}
+
+li.childorg {
+   padding:0.3em;
+   }
+   
+dt {
+   color:#255858;
+   font-size: large;
+   padding:.3em .9em;
+   }
+   
+#childlink {
+   font-size: small;
+   }
+   
+

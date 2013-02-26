@@ -102,3 +102,8 @@ INSTALLED_APPS = ('qofdb',
 
 INTERNAL_IPS=('127.0.0.1',)
 
+# Allow us to override these default settings locally as appropriate
+try:
+    from local_settings import *
+except:
+    pass
