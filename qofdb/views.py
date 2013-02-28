@@ -5,7 +5,9 @@ import defaults
 from django import forms
 from django.template import RequestContext
 import re
-from django.http import Http404
+from django.http import Http404,HttpResponse
+from django.core import serializers
+import json
 
 def browse(request,orgcode,year=None,area=None):
     """Browsing the data for an organisation either by summary or by area"""
@@ -186,7 +188,29 @@ def download(request):
     title="Data Downloads"
     return render_to_response('download.html',{'form':form,'title':title},context_instance=RequestContext(request))
 
-    
+def api_all(request,orgcode,year):
+	"""Send out all data for an organisation as a JSON format"""
+	organisation=get_object_or_404(models.Organisation,orgcode=orgcode)
+	details={'name':organisation.name,'address':organisation.addr,'level':organisation.level,'orgcode':orgcode,'year':year}
+	data=models.Achievement.objects.filter(orgcode=orgcode,year=year).values('numerator','denominator','areaid')
+	listout=[]
+	for row in data:
+		listout.append({'numerator':row['numerator'],'denominator':row['denominator'],'area':row['areaid']})
+	details['data']=listout
+#	jsonout=serializers.serialize("json",listout) #throws an error. No idea why.
+	jsonout=json.dumps(details)
+	return HttpResponse(jsonout,content_type="application/json")
+	
+def api_children(request,orgcode,year):
+	"""Produce a list of children of a given organisation. Include name and address as a convenience"""
+	organisation=get_object_or_404(models.Organisation,orgcode=orgcode)
+	children=organisation.children.filter(year=year).select_related()
+	listout=[]
+	for child in children:
+		listout.append({'orgcode':child.orgcode.orgcode,'name':child.orgcode.name,'address':child.orgcode.addr})
+	jsonout=json.dumps({'name':organisation.name,'address':organisation.addr,'year':year,'children':listout})
+	return HttpResponse(jsonout,content_type="application/json")
+	
     
     
     

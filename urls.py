@@ -16,7 +16,10 @@ urlpatterns = patterns('qofdb.views',
                        (r'^surgery.php','translate'),
                        (r'^pct.php','translate'),
                        (r'^download','download'),
+                       (r'^api/data/(?P<orgcode>\w{1,6})/(?P<year>\d{1,2})','api_all'),
+                       (r'^api/children/(?P<orgcode>\w{1,6})/(?P<year>\d{1,2})','api_children'),
                        (r'^$','browse',{'orgcode':'UK'}),
+
 
                        (url(r'^admin/', include(admin.site.urls))),
                        (r'^admin/doc/', include('django.contrib.admindocs.urls')),
