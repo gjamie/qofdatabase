@@ -6,7 +6,7 @@ from django import forms
 from django.template import RequestContext
 import re
 from django.http import Http404,HttpResponse
-from django.core import serializers
+#from django.core import serializers
 import json
 
 def browse(request,orgcode,year=None,area=None):
@@ -191,8 +191,19 @@ def download(request):
 def api_all(request,orgcode,year):
 	"""Send out all data for an organisation as a JSON format"""
 	organisation=get_object_or_404(models.Organisation,orgcode=orgcode)
+	if 'filter' in request.GET:#if there is a filter set then we will use it
+		subset=request.GET['filter']
+	else:
+		subset='all'
 	details={'name':organisation.name,'address':organisation.addr,'level':organisation.level,'orgcode':orgcode,'year':year}
-	data=models.Achievement.objects.filter(orgcode=orgcode,year=year).values('numerator','denominator','areaid')
+	data=organisation.achievement_set.filter(year=year)
+	if subset=='prevalence':
+		data=data.filter(areaid__flavour=1)
+	elif subset=='all':
+		pass
+	else :
+		data=data.filter(areaid__area=subset)
+	data=data.values('numerator','denominator','areaid')
 	listout=[]
 	for row in data:
 		listout.append({'numerator':row['numerator'],'denominator':row['denominator'],'area':row['areaid']})
@@ -205,12 +216,32 @@ def api_children(request,orgcode,year):
 	"""Produce a list of children of a given organisation. Include name and address as a convenience"""
 	organisation=get_object_or_404(models.Organisation,orgcode=orgcode)
 	children=organisation.children.filter(year=year).select_related()
-	listout=[]
-	for child in children:
-		listout.append({'orgcode':child.orgcode.orgcode,'name':child.orgcode.name,'address':child.orgcode.addr})
+	listout=[{'orgcode':child.orgcode.orgcode,'name':child.orgcode.name,'address':child.orgcode.addr} for child in children]
 	jsonout=json.dumps({'name':organisation.name,'address':organisation.addr,'year':year,'children':listout})
 	return HttpResponse(jsonout,content_type="application/json")
 	
-    
-    
+def api_areas(request):
+	"""A list of QOF areas currently in the database"""
+	areas=models.Indicator.objects.distinct().values_list('area',flat=True)
+	areas_ascii=[str(x) for x in areas] # json serializer does not like unicode
+	return HttpResponse(json.dumps(areas_ascii),content_type="application/json")
+	
+def api_timeline(request,orgcode,indicator):
+	"""Timeline view of a single indicator (or its equivalent) for single organisation over time"""
+	organisation=get_object_or_404(models.Organisation,orgcode=orgcode)
+	baseIndicator=get_object_or_404(models.Indicator,areaid=indicator)#find the baseindicator. Much of the time this will be the same
+	achievements=models.Achievement.objects.filter(areaid__base=baseIndicator.base,orgcode=orgcode).order_by("year").values('year','areaid','numerator','denominator','ratio','centile')
+	listout=[{'year':achievement['year'],'indicator':achievement['areaid'],'numerator':achievement['numerator'],'denominator':achievement['denominator']} for achievement in achievements]
+	jsonout=json.dumps({'name':organisation.name,'address':organisation.addr,'achievements':listout})
+	return HttpResponse(jsonout,content_type="application/json")
+	
+def api_indicator(request,search='all'):
+	"""Get details on either a range of indicators or a single indicator"""
+	indicator_dets=models.Indicator.objects
+	if search=="all":
+		indicator_dets=indicator_dets.all()
+	else:
+		indicator_dets=indicator_dets.filter(areaid__istartswith=search)
+	indout=[{'indicator':indicator.areaid,'description':indicator.description,'area':indicator.area,'flavour':indicator.flavour,'base':indicator.base} for indicator in indicator_dets]
+	return HttpResponse(json.dumps(indout),content_type="application/json")
     

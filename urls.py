@@ -18,6 +18,10 @@ urlpatterns = patterns('qofdb.views',
                        (r'^download','download'),
                        (r'^api/data/(?P<orgcode>\w{1,6})/(?P<year>\d{1,2})','api_all'),
                        (r'^api/children/(?P<orgcode>\w{1,6})/(?P<year>\d{1,2})','api_children'),
+                       (r'^api/areas$','api_areas'),
+                       (r'^api/timeline/(?P<orgcode>\w{1,6})/(?P<indicator>[\w ]+)$','api_timeline'),
+                       (r'^api/indicator/(?P<search>[\w ]+)$','api_indicator'),
+                       (r'^api/indicator','api_indicator'),
                        (r'^$','browse',{'orgcode':'UK'}),
 
 
