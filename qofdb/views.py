@@ -203,10 +203,10 @@ def api_all(request,orgcode,year):
 		pass
 	else :
 		data=data.filter(areaid__area=subset)
-	data=data.values('numerator','denominator','areaid')
+	data=data.values('numerator','denominator','areaid','centile')
 	listout=[]
 	for row in data:
-		listout.append({'numerator':row['numerator'],'denominator':row['denominator'],'area':row['areaid']})
+		listout.append({'numerator':row['numerator'],'denominator':row['denominator'],'area':row['areaid'],'centile':row['centile']})
 	details['data']=listout
 #	jsonout=serializers.serialize("json",listout) #throws an error. No idea why.
 	jsonout=json.dumps(details)

@@ -16,8 +16,10 @@
 </head>
 <body>
 <div id="title">
+{% if search %}
 <form action="/search/" method="GET">
 <span id="searchbox"><p>Find organisation: {{ search.search }}</p></span></form>
+{% endif %}
 <h1>QOF database</h1></div>
 <div id="topmenu"><a href="{% url qofdb.views.browse orgcode='UK' year=year|default:11 %}" >Home</a> | <a href="http://news.gpcontract.co.uk" >News</a> | <a href="{% url qofdb.views.download %}" >Downloads</a> | <a href="{%url faq_topic_list%}" >FAQ</a></div>
 {% block content %}{% endblock %}
